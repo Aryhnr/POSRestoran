@@ -30,7 +30,7 @@
     </div>
 
     <!-- Sidebar Form -->
-    <aside class="w-full lg:w-96 bg-white shadow p-6 flex-shrink-0 mt-6 lg:mt-0">
+    <aside class="w-full lg:w-96 bg-white shadow p-6 shrink-0 mt-6 lg:mt-0">
         <h2 class="text-xl font-bold mb-4">Form Pesanan</h2>
 
         <form action="{{ url('/pesanan') }}" method="POST" id="order-form">
