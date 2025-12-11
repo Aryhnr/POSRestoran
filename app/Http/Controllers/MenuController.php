@@ -3,62 +3,93 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Menu;
+use App\Models\KategoriMenu;
+use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $menus = Menu::all();
+        $kategoris = KategoriMenu::all();
+
+        return view('pages.menu-makanan', compact('menus', 'kategoris'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'kategori_id' => 'required|exists:kategori_menu,id',
+            'name'        => 'required|string|max:100',
+            'harga'       => 'required|numeric|min:0',
+            'foto'        => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
+
+        $data = $request->only(['kategori_id', 'name', 'harga']);
+
+        // Upload foto
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+
+            // Simpan di storage/app/public/fotos
+            $file->storeAs('public/fotos', $filename);
+
+            $data['foto'] = $filename;
+        }
+
+        Menu::create($data);
+
+        return redirect()->route("pages.menu-makanan")
+            ->with("success", "Data Menu Makanan Berhasil Ditambahkan");
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'kategori_id' => 'required|exists:kategori_menu,id',
+            'name'        => 'required|string|max:100',
+            'harga'       => 'required|numeric|min:0',
+            'foto'        => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
+
+        $menu = Menu::findOrFail($id);
+        $data = $request->only(['kategori_id', 'name', 'harga']);
+
+        // Upload foto baru
+        if ($request->hasFile('foto')) {
+            // Hapus foto lama jika ada
+            if ($menu->foto && Storage::exists('public/fotos/' . $menu->foto)) {
+                Storage::delete('public/fotos/' . $menu->foto);
+            }
+
+            $file = $request->file('foto');
+            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+
+            $file->storeAs('public/fotos', $filename);
+
+            $data['foto'] = $filename;
+        }
+
+        $menu->update($data);
+
+        return redirect()->route("pages.menu-makanan")
+            ->with("success", "Data Menu Makanan Berhasil Diupdate");
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy($id)
     {
-        //
-    }
+        $menu = Menu::findOrFail($id);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        // Hapus foto
+        if ($menu->foto && Storage::exists('public/fotos/' . $menu->foto)) {
+            Storage::delete('public/fotos/' . $menu->foto);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $menu->delete();
+
+        return redirect()->route('pages.menu-makanan')
+            ->with('success', 'Menu berhasil dihapus');
     }
 }
