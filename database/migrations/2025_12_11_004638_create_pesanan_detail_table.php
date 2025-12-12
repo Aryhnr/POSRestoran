@@ -18,7 +18,6 @@ return new class extends Migration
             $table->integer('qty')->default(1);
             $table->integer('subtotal')->default(0);
             $table->timestamps();
-
             $table->foreign('pesanan_id')->references('id')->on('pesanan')->onDelete('cascade');
             $table->foreign('menu_id')->references('id')->on('menu')->onDelete('cascade');
         });

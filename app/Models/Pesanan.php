@@ -8,6 +8,7 @@ class Pesanan extends Model
 {
     protected $table = 'pesanan';
     protected $fillable =[
+        'nama_pemesan',
         'diskon_id',
         'total_harga',
         'bayar',

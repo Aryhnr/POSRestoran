@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\KategoriMenuController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\PesananController;
+
 
 Route::get('/', function () {
     return view('pages.dashboard');
@@ -32,6 +34,14 @@ Route::put('/menu-makanan/update/{id}', [MenuController::class, 'update'])
     ->name('menu-makanan.update');
 Route::delete('/menu-makanan/delete/{id}', [MenuController::class, 'destroy'])
     ->name('menu-makanan.destroy');
+
+Route::get('/pesanan', [PesananController::class, 'index'])
+    ->name('pages.pesanan');
+
+Route::get('/pesanan', [PesananController::class, 'index']);
+Route::post('/pesanan', [PesananController::class, 'store']);
+
+
 
 
 
